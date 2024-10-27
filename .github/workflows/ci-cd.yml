@@ -3,10 +3,10 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - main  # Trigger on pushes to the main branch
+      - main
   pull_request:
     branches:
-      - main  # Trigger on pull requests to the main branch
+      - main
 
 jobs:
   build:
@@ -14,10 +14,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4  # Use the latest stable version
+        uses: actions/checkout@v3  # Ensure you're using the latest version
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v4  # This is already the latest version
         with:
           python-version: '3.9'
 
@@ -32,34 +32,28 @@ jobs:
 
       - name: Run tests (optional)
         run: |
-          # Add your test commands here, e.g., pytest or unittest
           echo "Running tests..."
 
   deploy:
     runs-on: ubuntu-latest
-    needs: build  # Ensure build job completes successfully
+    needs: build
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4  # Use the latest stable version
+        uses: actions/checkout@v3
 
       - name: Login to Docker Hub
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: |
-          echo "Logging in to Docker Hub..."
           echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
       - name: Build and Push Docker image
         run: |
-          echo "Building Docker image..."
           docker build -t yourusername/flask-app:latest .
-          echo "Pushing Docker image..."
           docker push yourusername/flask-app:latest
 
       - name: Deploy to server (optional)
         run: |
           echo "Deploying to server..."
-          # Add your deployment commands here
-          echo "Deployment command executed."
