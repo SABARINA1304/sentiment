@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4  # Checkout the code
-      
+
       - name: List directory contents  # Verify directory structure
         run: |
           echo "Current Directory Contents:"
@@ -19,7 +19,7 @@ jobs:
 
       - name: Build The Docker Image
         run: |
-          docker build . --file sentiment/Dockerfile --tag workflow-test:$(date +%s)  # Use current directory as context
+          docker build sentiment --file sentiment/Dockerfile --tag workflow-test:$(date +%s)  # Use sentiment as context
 
   build-and-test:
     runs-on: ubuntu-latest
