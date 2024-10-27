@@ -1,29 +1,65 @@
-deploy:
-  runs-on: ubuntu-latest
-  needs: build  # Ensure build job completes successfully
+name: CI/CD Pipeline
 
-  steps:
-    - name: Checkout code
-      uses: actions/checkout@v4  # Use the latest stable version
+on:
+  push:
+    branches:
+      - main  # Trigger on pushes to the main branch
+  pull_request:
+    branches:
+      - main  # Trigger on pull requests to the main branch
 
-    - name: Login to Docker Hub
-      env:
-        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-      run: |
-        echo "Logging in to Docker Hub..."
-        echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-    - name: Build and Push Docker image
-      run: |
-        echo "Building Docker image..."
-        docker build -t yourusername/flask-app:latest .
-        echo "Pushing Docker image..."
-        docker push yourusername/flask-app:latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4  # Use the latest stable version
 
-    - name: Deploy to server (optional)
-      run: |
-        echo "Deploying to server..."
-        # Add your deployment commands here
-        # Example: SSH to server and pull the latest image
-        echo "Deployment command executed."
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Build Docker image
+        run: |
+          docker build -t flask-app .
+
+      - name: Run tests (optional)
+        run: |
+          # Add your test commands here, e.g., pytest or unittest
+          echo "Running tests..."
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build  # Ensure build job completes successfully
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4  # Use the latest stable version
+
+      - name: Login to Docker Hub
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: |
+          echo "Logging in to Docker Hub..."
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Build and Push Docker image
+        run: |
+          echo "Building Docker image..."
+          docker build -t yourusername/flask-app:latest .
+          echo "Pushing Docker image..."
+          docker push yourusername/flask-app:latest
+
+      - name: Deploy to server (optional)
+        run: |
+          echo "Deploying to server..."
+          # Add your deployment commands here
+          echo "Deployment command executed."
