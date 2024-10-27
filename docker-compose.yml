@@ -1,0 +1,11 @@
+version: "3.7"
+
+services:
+  mlapp:
+    container_name: mlapp
+    image: sabarina134/mlapp:latest  # Updated to your Docker Hub repository
+    ports:
+      - "5000:5000"
+    build:
+      context: .
+      dockerfile: Dockerfile
