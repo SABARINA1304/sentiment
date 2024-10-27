@@ -12,14 +12,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4  # Checkout the code
 
-      - name: List directory contents  # Verify directory structure
+      - name: List contents of sentiment directory  # Verify if requirements.txt exists
         run: |
-          echo "Current Directory Contents:"
-          ls -R  # Recursively list files to check the structure
+          echo "Contents of sentiment directory:"
+          ls sentiment/  # List files in sentiment directory
 
       - name: Build The Docker Image
         run: |
-          docker build sentiment --file sentiment/Dockerfile --tag workflow-test:$(date +%s)  # Use sentiment as context
+          docker build . --file sentiment/Dockerfile --tag workflow-test:$(date +%s)  # Use current directory as context
 
   build-and-test:
     runs-on: ubuntu-latest
@@ -35,6 +35,11 @@ jobs:
       - name: Upgrade pip
         run: |
           python -m pip install --upgrade pip  # Upgrade pip
+
+      - name: List contents of sentiment directory  # Verify if requirements.txt exists
+        run: |
+          echo "Contents of sentiment directory:"
+          ls sentiment/  # List files in sentiment directory
 
       - name: Install dependencies
         run: |
