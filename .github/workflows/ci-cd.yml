@@ -10,11 +10,16 @@ jobs:
   dockerbuild:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4  # Checkout the code
       
+      - name: List directory contents  # Verify directory structure
+        run: |
+          echo "Current Directory Contents:"
+          ls -R  # Recursively list files to check the structure
+
       - name: Build The Docker Image
         run: |
-          docker build sentiment --file sentiment/Dockerfile --tag workflow-test:$(date +%s)  # Use sentiment as context
+          docker build . --file sentiment/Dockerfile --tag workflow-test:$(date +%s)  # Use current directory as context
 
   build-and-test:
     runs-on: ubuntu-latest
@@ -27,9 +32,12 @@ jobs:
         with:
           python-version: '3.9'
 
+      - name: Upgrade pip
+        run: |
+          python -m pip install --upgrade pip  # Upgrade pip
+
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
           pip install -r sentiment/requirements.txt  # Ensure requirements.txt is present in sentiment folder
 
       - name: Run tests
@@ -55,7 +63,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
-          context: .
+          context: .  # Use current directory as context
           file: sentiment/Dockerfile  # Dockerfile path
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/flasktest-app:latest
