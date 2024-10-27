@@ -26,14 +26,17 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: List installed packages
+        run: |
+          pip list  # Optional: To verify that pytest is installed
+
       - name: Build Docker image
         run: |
           docker build -t flask-app . || { echo 'Docker build failed'; exit 1; }
 
-      - name: Run tests (optional)
+      - name: Run tests
         run: |
           echo "Running tests..."
-          # Replace with your actual test command, e.g., pytest
           pytest || { echo 'Tests failed'; exit 5; }
 
   deploy:
